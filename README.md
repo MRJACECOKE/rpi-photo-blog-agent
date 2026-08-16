@@ -15,6 +15,12 @@ Python은 모델을 직접 로드하지 않습니다. 프로젝트 전용으로 
 - [GitHub 게시 절차](docs/GITHUB_PUBLISH.md)
 - [검수된 최종 블로그 샘플](examples/smoke-success.md)
 
+## 실제 smoke test 입력
+
+![Smoke test에 사용한 주방 사진](fixtures/smoke/kitchen-cabinets-sink.jpg)
+
+성공 run에는 위 1280×854 사진을 사용했습니다. “Kitchen Cabinets - Sink” by amslerPIX, [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Kitchen_Cabinets_-_Sink.jpg). 저장소의 파일은 크기를 조정하고 EXIF를 제거한 파생본입니다. 자세한 내용은 [`fixtures/smoke/ATTRIBUTION.md`](fixtures/smoke/ATTRIBUTION.md)를 참조하세요.
+
 ## 왜 Q4_K_M이 기본이 아닌가
 
 `Qwen3-30B-A3B-Instruct-2507`은 MoE 모델이라 토큰당 활성 파라미터 수가 전체 파라미터보다 적습니다. 하지만 GGUF 파일은 전체 모델 가중치를 저장하므로 파일 크기와 mmap/page cache 압박은 여전히 큽니다. Raspberry Pi 5 16GB에서는 18GB급 `Q4_K_M`을 기본값으로 잡으면 OOM, swap 폭주, 시스템 정지 위험이 커집니다.
@@ -94,10 +100,10 @@ dry-run은 이미지 검증/전처리, 메모리 확인, 모델/바이너리 경
 
 ```bash
 python -m app.cli \
-  --image inputs/example.jpg \
-  --topic "주말 산책에서 발견한 풍경" \
-  --audience "일상과 사진을 좋아하는 독자" \
-  --tone "차분하고 따뜻한 정보형" \
+  --image fixtures/smoke/kitchen-cabinets-sink.jpg \
+  --topic "사진으로 살펴보는 주방 수납과 작업 동선 아이디어" \
+  --audience "실용적인 주방 정리 아이디어를 찾는 한국어 독자" \
+  --tone "전문적이고 차분하며 과장 없는 한국어" \
   --output outputs/example-blog.md
 ```
 

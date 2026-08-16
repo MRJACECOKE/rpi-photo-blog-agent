@@ -140,3 +140,5 @@ python -m app.cli \
 - process lifecycle 또는 signal 처리 변경
 
 full smoke 승인 조건은 VLM/LLM exit 0, VLM PID 선종료, memory handoff 성공, kernel OOM 없음, 구조 검증 통과, 사진 기반 콘텐츠 검수 통과다.
+
+공개 회귀 입력은 `fixtures/smoke/kitchen-cabinets-sink.jpg`에 고정하고 SHA-256과 CC BY 2.0 attribution을 함께 검증한다. 이를 통해 입력 사진부터 최종 `examples/smoke-success.md`까지 동일한 평가 조건을 재현할 수 있다.

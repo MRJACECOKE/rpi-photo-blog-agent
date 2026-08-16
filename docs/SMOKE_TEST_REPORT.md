@@ -39,6 +39,10 @@ HTTP 500
 
 Run ID: `20260816T160703Z-f3393417`
 
+![실제 smoke test 입력 사진](../fixtures/smoke/kitchen-cabinets-sink.jpg)
+
+입력은 Wikimedia Commons의 “Kitchen Cabinets - Sink” by amslerPIX, CC BY 2.0 사진을 1280×854 RGB JPEG로 정규화하고 EXIF를 제거한 파일이다. 입력 SHA-256은 `1c007ab919b41d30f49729346ab5eef1734748f787249e419c60794c04c69649`이며, [`fixtures/smoke/ATTRIBUTION.md`](../fixtures/smoke/ATTRIBUTION.md)에 출처와 파생 작업을 기록했다.
+
 | 지표 | VLM | LLM retry |
 |---|---:|---:|
 | 모델 크기 | 1,929,901,056 bytes | 10,845,131,168 bytes |

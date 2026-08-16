@@ -10,6 +10,7 @@
 - `Makefile`, `pytest.ini`, `requirements.txt`, `.env.example`
 - `docs/`, `HANDOFF.md`, `README.md`: 설계, incident, evidence, 게시 절차
 - `inputs/example.jpg`: 합성 테스트 이미지
+- `fixtures/smoke/`: 실제 성공 smoke 입력과 CC BY 2.0 attribution metadata
 - `examples/smoke-success.md`: 검수된 smoke 출력 샘플
 
 ## 저장소에서 의도적으로 제외하는 항목

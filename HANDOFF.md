@@ -10,6 +10,7 @@
 - VLM PID 소멸과 `MemAvailable >= 12,288 MiB`를 모두 확인해야 LLM을 시작한다.
 - 성공 smoke에서 VLM exit 0, LLM retry exit 0, OOM 없음, 당시 테스트 32개 통과를 확인했다. 공개 패키징 회귀 테스트는 33개가 통과했다.
 - 최종 검수 블로그는 [`examples/smoke-success.md`](examples/smoke-success.md)이며 SHA-256은 `69b0e33d3b31993d370064acb75059398d4080440363df400276de2a46de4a67`이다.
+- 실제 smoke 입력은 [`fixtures/smoke/kitchen-cabinets-sink.jpg`](fixtures/smoke/kitchen-cabinets-sink.jpg)이며, CC BY 2.0 attribution과 입력 해시를 함께 보존했다.
 
 ![VLM에서 LLM으로 이어지는 메모리 안전 워크플로우](docs/diagrams/workflow.svg)
 

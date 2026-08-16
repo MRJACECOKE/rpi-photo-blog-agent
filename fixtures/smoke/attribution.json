@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "items": [
+    {
+      "id": "kitchen-cabinets-sink",
+      "local_path": "kitchen-cabinets-sink.jpg",
+      "title": "Kitchen Cabinets - Sink",
+      "creator": "amslerPIX",
+      "source_page_url": "https://commons.wikimedia.org/wiki/File:Kitchen_Cabinets_-_Sink.jpg",
+      "license": {
+        "id": "CC-BY-2.0",
+        "url": "https://creativecommons.org/licenses/by/2.0/",
+        "attribution_required": true
+      },
+      "rights_status": "publish_allowed",
+      "sanitized_sha256": "1c007ab919b41d30f49729346ab5eef1734748f787249e419c60794c04c69649",
+      "sanitized_mime": "image/jpeg",
+      "sanitized_width": 1280,
+      "sanitized_height": 854,
+      "derivative_operations": [
+        "apply_exif_orientation",
+        "resize",
+        "convert_rgb_jpeg",
+        "strip_exif"
+      ],
+      "evaluation": {
+        "target_tasks": [
+          "complex_scene",
+          "spatial_relation",
+          "grounded_copy"
+        ],
+        "forbidden_facts": [
+          "brand",
+          "exact material",
+          "price",
+          "dimensions"
+        ]
+      }
+    }
+  ]
+}
