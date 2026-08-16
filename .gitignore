@@ -1,0 +1,15 @@
+.venv-blog-agent/
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+logs/*.log
+runs/*
+!runs/.gitkeep
+outputs/*
+!outputs/.gitkeep
+inputs/downloaded-test.jpg
+models/**/*.gguf
+models/**/*.gguf.*
+third_party/llama.cpp/

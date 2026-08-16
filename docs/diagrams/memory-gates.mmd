@@ -1,0 +1,13 @@
+flowchart TD
+    A[Candidate LLM] --> B{GGUF total <= 12.5 GiB?}
+    B -->|no| X[Reject unless explicit override]
+    B -->|yes| C{VLM PID gone?}
+    C -->|no| Y[Refuse LLM start]
+    C -->|yes| D{MemAvailable >= 12,288 MiB?}
+    D -->|wait/timeout| Z[Safe fail]
+    D -->|yes| E[Start isolated LLM process group]
+    E --> F{During-run safety monitor}
+    F -->|MemAvailable < 1,536 MiB| G[Terminate current process group]
+    F -->|swap > 85%| G
+    F -->|temperature >= 82 C| G
+    F -->|healthy| H[Continue to completion]

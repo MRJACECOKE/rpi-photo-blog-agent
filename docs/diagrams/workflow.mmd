@@ -1,0 +1,15 @@
+flowchart LR
+    A[Input image] --> B[Preprocess]
+    B --> C{MemAvailable >= 4 GiB}
+    C -->|yes| D[VLM process]
+    C -->|timeout| X[Safe fail]
+    D --> E{exit 0 + JSON valid}
+    E -->|no| X
+    E -->|yes| F[Confirm VLM PID gone]
+    F --> G{MemAvailable >= 12 GiB}
+    G -->|timeout| X
+    G -->|yes| H[Build grounded prompt]
+    H --> I[LLM process]
+    I --> J{exit 0 + Markdown gate}
+    J -->|no| X
+    J -->|yes| K[Atomic output + metrics]

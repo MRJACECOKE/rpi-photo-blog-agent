@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="420" viewBox="0 0 1400 420" role="img" aria-labelledby="title desc">
+  <title id="title">VLM to LLM sequential memory-safe workflow</title>
+  <desc id="desc">An input image is preprocessed, analyzed by a VLM, the VLM is stopped and memory is recovered, then an LLM generates and validates the blog.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#64748b"/></marker>
+    <filter id="shadow"><feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.14"/></filter>
+  </defs>
+  <rect width="1400" height="420" rx="24" fill="#f8fafc"/>
+  <text x="70" y="66" font-family="sans-serif" font-size="30" font-weight="700" fill="#0f172a">Memory-safe sequential inference</text>
+  <text x="70" y="100" font-family="sans-serif" font-size="17" fill="#475569">VLM and LLM never coexist in memory</text>
+  <g filter="url(#shadow)" font-family="sans-serif">
+    <rect x="70" y="155" width="175" height="110" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="158" y="195" text-anchor="middle" font-size="19" font-weight="700" fill="#0f172a">Input image</text>
+    <text x="158" y="226" text-anchor="middle" font-size="15" fill="#64748b">validate · resize</text>
+    <rect x="300" y="155" width="210" height="110" rx="16" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+    <text x="405" y="195" text-anchor="middle" font-size="19" font-weight="700" fill="#075985">VLM process</text>
+    <text x="405" y="226" text-anchor="middle" font-size="15" fill="#0369a1">Qwen2.5-VL 3B</text>
+    <rect x="565" y="135" width="270" height="150" rx="16" fill="#fff7ed" stroke="#ea580c" stroke-width="3"/>
+    <text x="700" y="174" text-anchor="middle" font-size="19" font-weight="700" fill="#9a3412">Hard handoff gate</text>
+    <text x="700" y="207" text-anchor="middle" font-size="15" fill="#7c2d12">VLM exit = 0</text>
+    <text x="700" y="232" text-anchor="middle" font-size="15" fill="#7c2d12">PID no longer exists</text>
+    <text x="700" y="257" text-anchor="middle" font-size="15" fill="#7c2d12">MemAvailable ≥ 12,288 MiB</text>
+    <rect x="890" y="155" width="210" height="110" rx="16" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+    <text x="995" y="195" text-anchor="middle" font-size="19" font-weight="700" fill="#5b21b6">LLM process</text>
+    <text x="995" y="226" text-anchor="middle" font-size="15" fill="#6d28d9">Qwen3 30B IQ2_M</text>
+    <rect x="1155" y="155" width="175" height="110" rx="16" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <text x="1243" y="195" text-anchor="middle" font-size="19" font-weight="700" fill="#166534">Validated blog</text>
+    <text x="1243" y="226" text-anchor="middle" font-size="15" fill="#15803d">atomic write</text>
+  </g>
+  <g fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)">
+    <path d="M245 210 H290"/><path d="M510 210 H555"/><path d="M835 210 H880"/><path d="M1100 210 H1145"/>
+  </g>
+  <rect x="300" y="322" width="800" height="42" rx="21" fill="#e2e8f0"/>
+  <rect x="300" y="322" width="255" height="42" rx="21" fill="#38bdf8"/>
+  <rect x="880" y="322" width="220" height="42" rx="21" fill="#8b5cf6"/>
+  <text x="700" y="350" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="700" fill="#334155">Only one model process is resident at a time</text>
+</svg>

@@ -1,0 +1,18 @@
+[Unit]
+Description=Raspberry Pi Photo Blog Agent
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/rpi-photo-blog-agent
+EnvironmentFile=%h/rpi-photo-blog-agent/.env
+Environment=AGENT_ARGS=
+ExecStart=%h/rpi-photo-blog-agent/.venv-blog-agent/bin/python -m app.cli $AGENT_ARGS
+OOMPolicy=stop
+MemoryAccounting=true
+MemoryHigh=13G
+MemoryMax=14G
+TasksMax=64
+Nice=5
+
+[Install]
+WantedBy=default.target

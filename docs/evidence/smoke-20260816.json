@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "captured_at": "2026-08-17",
+  "hardware": {
+    "device": "Raspberry Pi 5",
+    "ram_class_gib": 16,
+    "architecture": "aarch64",
+    "cpu": "4-core Cortex-A76",
+    "os": "Debian GNU/Linux 13 (trixie)",
+    "kernel": "6.18.34+rpt-rpi-2712"
+  },
+  "failed_baseline": {
+    "runtime": "Ollama",
+    "llm": "qwen3:30b-a3b Q4",
+    "model_size_gib": 17.28,
+    "vlm_unloaded_before_llm": true,
+    "mem_available_before_llm_mib": 13940,
+    "result": "kernel OOM killed llama-server; HTTP 500",
+    "host_reboot_during_this_run": false
+  },
+  "successful_pipeline": {
+    "run_id": "20260816T160703Z-f3393417",
+    "vlm": {
+      "model": "Qwen2.5-VL-3B-Instruct-Q4_K_M",
+      "model_bytes": 1929901056,
+      "exit_code": 0,
+      "duration_seconds": 403.172,
+      "peak_rss_mib": 5046.4,
+      "mem_available_before_mib": 14651,
+      "mem_available_after_mib": 15145
+    },
+    "handoff": {
+      "vlm_pid_gone_before_llm": true,
+      "target_mem_available_mib": 12288,
+      "recovered": true,
+      "wait_seconds": 0.006
+    },
+    "llm_retry": {
+      "model": "Qwen3-30B-A3B-Instruct-2507-UD-IQ2_M",
+      "model_bytes": 10845131168,
+      "exit_code": 0,
+      "duration_seconds": 714.294,
+      "peak_rss_mib": 10668.9,
+      "mem_available_before_mib": 15130,
+      "mem_available_after_mib": 15233,
+      "oom_observed": false
+    },
+    "thermal": {
+      "maximum_celsius_in_full_run": 66.65,
+      "historical_throttle_bit_observed": true
+    },
+    "tests": {
+      "passed": 32,
+      "failed": 0
+    },
+    "content_audit": {
+      "raw_model_output_preserved_locally": true,
+      "human_visual_cross_check": true,
+      "unsupported_phrasing_removed": true,
+      "required_sections_complete": true,
+      "prompt_leakage": false,
+      "final_sha256": "69b0e33d3b31993d370064acb75059398d4080440363df400276de2a46de4a67"
+    }
+  }
+}
