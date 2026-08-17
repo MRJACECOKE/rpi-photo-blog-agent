@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="680" viewBox="0 0 1500 680" role="img" aria-labelledby="pc-title pc-desc">
+  <title id="pc-title">섹션 단위 생성과 프롬프트 캐시 재사용</title>
+  <desc id="pc-desc">ChatML 대화 기록을 누적해 프롬프트가 항상 직전 프롬프트의 확장이 되게 만들어 llama-server의 cache_prompt가 공통 프리픽스를 재사용한다. 한 번만 처리하면 되는 부분과 매번 새로 처리하는 부분을 비교한다.</desc>
+  <defs>
+    <marker id="pc-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+    </marker>
+    <filter id="pc-shadow"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity="0.13"/></filter>
+  </defs>
+
+  <rect width="1500" height="680" rx="24" fill="#f8fafc"/>
+  <text x="60" y="58" font-family="sans-serif" font-size="28" font-weight="700" fill="#0f172a">왜 작성 단계만 llama-server인가 — 프롬프트 캐시</text>
+  <text x="60" y="90" font-family="sans-serif" font-size="16" fill="#475569">실측: 프롬프트 처리 7~8 tok/s가 병목이다. 생성 속도가 아니라 이쪽이 설계를 결정했다.</text>
+
+  <!-- 범례 -->
+  <g font-family="sans-serif">
+    <rect x="60" y="116" width="20" height="14" rx="3" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="88" y="128" font-size="13" fill="#166534">캐시 적중 — 다시 처리하지 않음</text>
+    <rect x="330" y="116" width="20" height="14" rx="3" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+    <text x="358" y="128" font-size="13" fill="#991b1b">새로 처리하는 토큰</text>
+  </g>
+
+  <!-- 섹션 1 -->
+  <g font-family="sans-serif">
+    <text x="60" y="176" font-size="14" font-weight="700" fill="#334155">섹션 1 (title)</text>
+    <rect x="200" y="158" width="620" height="30" rx="5" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+    <text x="510" y="178" text-anchor="middle" font-size="13" fill="#991b1b">기저 프롬프트 1,342 토큰 (시스템 규칙 + 사진 분석 JSON + 지시)</text>
+    <text x="840" y="178" font-size="13" font-weight="700" fill="#dc2626">188초 프리필</text>
+    <text x="990" y="178" font-size="13" fill="#64748b">← 이 비용은 한 번만 낸다</text>
+  </g>
+
+  <!-- 섹션 2 -->
+  <g font-family="sans-serif">
+    <text x="60" y="234" font-size="14" font-weight="700" fill="#334155">섹션 2 (overview)</text>
+    <rect x="200" y="216" width="620" height="30" rx="5" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="510" y="236" text-anchor="middle" font-size="13" fill="#166534">동일한 1,342 토큰 — 캐시 적중, 재처리 없음</text>
+    <rect x="824" y="216" width="90" height="30" rx="5" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+    <text x="869" y="236" text-anchor="middle" font-size="12" fill="#991b1b">+155</text>
+    <text x="930" y="236" font-size="13" fill="#64748b">새 지시문만 처리</text>
+  </g>
+
+  <!-- 섹션 3 -->
+  <g font-family="sans-serif">
+    <text x="60" y="292" font-size="14" font-weight="700" fill="#334155">섹션 3 (fit_space)</text>
+    <rect x="200" y="274" width="620" height="30" rx="5" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="510" y="294" text-anchor="middle" font-size="13" fill="#166534">기저 프롬프트</text>
+    <rect x="824" y="274" width="90" height="30" rx="5" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="869" y="294" text-anchor="middle" font-size="12" fill="#166534">섹션2</text>
+    <rect x="918" y="274" width="90" height="30" rx="5" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+    <text x="963" y="294" text-anchor="middle" font-size="12" fill="#991b1b">+169</text>
+  </g>
+
+  <!-- 섹션 N -->
+  <g font-family="sans-serif">
+    <text x="60" y="350" font-size="14" font-weight="700" fill="#334155">섹션 12 (closing)</text>
+    <rect x="200" y="332" width="620" height="30" rx="5" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="510" y="352" text-anchor="middle" font-size="13" fill="#166534">기저 프롬프트</text>
+    <rect x="824" y="332" width="290" height="30" rx="5" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="969" y="352" text-anchor="middle" font-size="12" fill="#166534">섹션 2~11 누적 (캐시 적중)</text>
+    <rect x="1118" y="332" width="90" height="30" rx="5" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+    <text x="1163" y="352" text-anchor="middle" font-size="12" fill="#991b1b">+136</text>
+  </g>
+
+  <text x="200" y="392" font-family="sans-serif" font-size="13" fill="#64748b">llama-server 로그 근거: <tspan font-family="monospace" font-size="12.5" fill="#334155">selected slot by LCP similarity, sim_best = 0.907</tspan></text>
+
+  <!-- 비교 박스 -->
+  <g font-family="sans-serif" filter="url(#pc-shadow)">
+    <rect x="60" y="424" width="670" height="216" rx="14" fill="#ffffff" stroke="#dc2626" stroke-width="2"/>
+    <text x="85" y="454" font-size="16" font-weight="700" fill="#991b1b">만약 one-shot CLI로 만들었다면</text>
+    <text x="85" y="484" font-size="13.5" fill="#334155">섹션마다 프로세스를 새로 띄우고 전체 프롬프트를 다시 처리한다.</text>
+    <text x="85" y="508" font-size="13.5" fill="#334155">1,342 토큰 ÷ 7.1 tok/s ≈ <tspan font-weight="700">섹션당 약 190초</tspan></text>
+    <text x="85" y="532" font-size="13.5" fill="#334155">× 12 섹션 = <tspan font-weight="700" fill="#dc2626">프리필에만 약 38분</tspan> (생성 시간 제외)</text>
+    <text x="85" y="562" font-size="13.5" fill="#334155">게다가 누적 대화까지 다시 넣으면 더 늘어난다.</text>
+    <text x="85" y="596" font-size="13" fill="#64748b">모델 재적재 자체는 page cache 덕에 1.85초로 싸다.</text>
+    <text x="85" y="618" font-size="13" fill="#64748b">비싼 것은 <tspan font-weight="700">프롬프트 재처리</tspan>다.</text>
+  </g>
+
+  <g font-family="sans-serif" filter="url(#pc-shadow)">
+    <rect x="760" y="424" width="680" height="216" rx="14" fill="#ffffff" stroke="#16a34a" stroke-width="2"/>
+    <text x="785" y="454" font-size="16" font-weight="700" fill="#166534">실제 채택안 — llama-server + ChatML 누적</text>
+    <text x="785" y="484" font-size="13.5" fill="#334155">프롬프트를 <tspan font-weight="700">항상 직전 프롬프트의 확장</tspan>으로 만든다.</text>
+    <text x="785" y="508" font-size="13.5" fill="#334155">그래야 공통 프리픽스가 깨지지 않고 KV 캐시가 살아 있다.</text>
+    <text x="785" y="538" font-size="13.5" fill="#334155">첫 섹션 195.8초 → 이후 섹션 <tspan font-weight="700" fill="#166534">69~168초</tspan></text>
+    <text x="785" y="568" font-size="13.5" fill="#334155">재생성이 필요하면 거부된 본문은 기록에 넣지 않는다.</text>
+    <text x="785" y="590" font-size="13" fill="#64748b">(남겨 두면 다음 섹션이 그 표현을 따라 쓴다)</text>
+    <text x="785" y="620" font-size="13" fill="#0f172a">VLM은 반대로 one-shot 유지 — 이미지마다 컨텍스트가 완전히</text>
+    <text x="785" y="638" font-size="13" fill="#0f172a">달라 캐시 이득이 없고, 프로세스 종료가 곧 확실한 메모리 회수다.</text>
+  </g>
+</svg>

@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="720" viewBox="0 0 1500 720" role="img" aria-labelledby="ar-title ar-desc">
+  <title id="ar-title">모듈 구성도</title>
+  <desc id="ar-desc">GUI와 CLI가 같은 orchestrator를 호출하고, orchestrator가 스테이지 모듈을 호출하며, 런타임 계층이 llama.cpp 프로세스를 관리한다. 설정은 전부 YAML에 외부화되어 있다.</desc>
+  <defs>
+    <marker id="ar-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+    </marker>
+    <filter id="ar-shadow"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity="0.13"/></filter>
+  </defs>
+
+  <rect width="1500" height="720" rx="24" fill="#f8fafc"/>
+  <text x="60" y="58" font-family="sans-serif" font-size="28" font-weight="700" fill="#0f172a">모듈 구성도</text>
+  <text x="60" y="90" font-family="sans-serif" font-size="16" fill="#475569">GUI는 파이프라인 로직을 갖지 않는다. CLI와 <tspan font-family="monospace" font-size="14">app/pipeline.py</tspan> 를 공유한다.</text>
+
+  <!-- 진입 계층 -->
+  <text x="60" y="136" font-family="sans-serif" font-size="14" font-weight="700" fill="#64748b">진입점</text>
+  <g font-family="sans-serif" filter="url(#ar-shadow)">
+    <rect x="60" y="150" width="300" height="76" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+    <text x="210" y="178" text-anchor="middle" font-size="15" font-weight="700" fill="#1e40af">app/gui/app.py</text>
+    <text x="210" y="202" text-anchor="middle" font-size="12.5" fill="#1e3a8a">FastAPI · SSE · 업로드 · 편집</text>
+
+    <rect x="390" y="150" width="300" height="76" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+    <text x="540" y="178" text-anchor="middle" font-size="15" font-weight="700" fill="#1e40af">app/cli_jobs.py</text>
+    <text x="540" y="202" text-anchor="middle" font-size="12.5" fill="#1e3a8a">new · run · list · show · preflight</text>
+  </g>
+
+  <!-- 설정 -->
+  <g font-family="sans-serif" filter="url(#ar-shadow)">
+    <rect x="1000" y="150" width="440" height="150" rx="12" fill="#ffffff" stroke="#d97706" stroke-width="2"/>
+    <text x="1220" y="178" text-anchor="middle" font-size="15" font-weight="700" fill="#92400e">config/ — 값은 전부 여기에</text>
+    <text x="1022" y="206" font-size="12.5" fill="#334155">models.yaml — tier 사다리 · 경로 · 실측값 · 게이트</text>
+    <text x="1022" y="230" font-size="12.5" fill="#334155">blog.yaml — 섹션 12개 · 금칙어 · 용어 · 분량</text>
+    <text x="1022" y="254" font-size="12.5" fill="#334155">runtime.yaml — 메모리 · 온도 · 타임아웃 · 포트</text>
+    <text x="1022" y="278" font-size="12.5" fill="#334155">prompts.yaml — VLM / LLM 프롬프트</text>
+  </g>
+  <path d="M1000,226 L900,226 L900,262 L806,262" fill="none" stroke="#d97706" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ar-arrow)"/>
+  <text x="905" y="300" font-family="sans-serif" font-size="12" fill="#92400e">app/settings.py 가 읽어 주입</text>
+
+  <!-- orchestrator -->
+  <g font-family="sans-serif" filter="url(#ar-shadow)">
+    <rect x="235" y="272" width="570" height="80" rx="12" fill="#fff7ed" stroke="#ea580c" stroke-width="3"/>
+    <text x="520" y="302" text-anchor="middle" font-size="17" font-weight="700" fill="#9a3412">app/pipeline.py — orchestrator</text>
+    <text x="520" y="330" text-anchor="middle" font-size="12.5" fill="#7c2d12">preflight · 6개 스테이지 순서 강제 · tier 하향 · run.lock · 진행률 이벤트</text>
+  </g>
+  <g fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ar-arrow)">
+    <path d="M210,228 L210,290 L231,290"/>
+    <path d="M540,228 L540,268"/>
+  </g>
+
+  <!-- 스테이지 모듈 -->
+  <text x="60" y="392" font-family="sans-serif" font-size="14" font-weight="700" fill="#64748b">스테이지 모듈</text>
+  <g font-family="sans-serif" filter="url(#ar-shadow)" font-size="12.5">
+    <rect x="60" y="406" width="215" height="70" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="167" y="432" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">image_prep.py</text>
+    <text x="167" y="456" text-anchor="middle" fill="#64748b">사본 · EXIF · sha256</text>
+
+    <rect x="291" y="406" width="215" height="70" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="398" y="432" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">privacy.py</text>
+    <text x="398" y="456" text-anchor="middle" fill="#64748b">YuNet · QR · GPS</text>
+
+    <rect x="522" y="406" width="215" height="70" rx="10" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+    <text x="629" y="432" text-anchor="middle" font-size="14" font-weight="700" fill="#075985">vision_stage.py</text>
+    <text x="629" y="456" text-anchor="middle" fill="#0369a1">VLM · JSON 정규화</text>
+
+    <rect x="753" y="406" width="215" height="70" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+    <text x="860" y="432" text-anchor="middle" font-size="14" font-weight="700" fill="#5b21b6">writer_stage.py</text>
+    <text x="860" y="456" text-anchor="middle" fill="#6d28d9">섹션 생성 · 캐시</text>
+
+    <rect x="984" y="406" width="215" height="70" rx="10" fill="#ffffff" stroke="#16a34a" stroke-width="2"/>
+    <text x="1091" y="432" text-anchor="middle" font-size="14" font-weight="700" fill="#166534">quality_stage.py</text>
+    <text x="1091" y="456" text-anchor="middle" fill="#15803d">규칙 기반 검사</text>
+
+    <rect x="1215" y="406" width="225" height="70" rx="10" fill="#ffffff" stroke="#16a34a" stroke-width="2"/>
+    <text x="1327" y="432" text-anchor="middle" font-size="14" font-weight="700" fill="#166534">output_stage.py</text>
+    <text x="1327" y="456" text-anchor="middle" fill="#15803d">.txt · .meta.json</text>
+  </g>
+  <path d="M520,354 L520,398" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ar-arrow)"/>
+
+  <!-- 런타임 계층 -->
+  <text x="60" y="522" font-family="sans-serif" font-size="14" font-weight="700" fill="#64748b">런타임 계층 — 모델 수명 관리</text>
+  <g font-family="sans-serif" filter="url(#ar-shadow)">
+    <rect x="60" y="536" width="680" height="150" rx="12" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
+    <text x="400" y="564" text-anchor="middle" font-size="15" font-weight="700" fill="#9a3412">app/runtime.py</text>
+    <text x="82" y="592" font-size="12.5" fill="#334155">MtmdVisionRuntime — VLM one-shot 실행</text>
+    <text x="82" y="616" font-size="12.5" fill="#334155">LlamaServerRuntime — LLM 서버 기동 · /completion · 종료</text>
+    <text x="82" y="640" font-size="12.5" fill="#334155">OllamaRuntime — 폴백 (로컬 데몬)</text>
+    <text x="82" y="666" font-size="12.5" font-weight="700" fill="#9a3412">unload_gate() — PID 소멸 + MemAvailable 실측 검증</text>
+  </g>
+
+  <!-- 공유 계층 -->
+  <g font-family="sans-serif" filter="url(#ar-shadow)">
+    <rect x="770" y="536" width="670" height="150" rx="12" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+    <text x="1105" y="564" text-anchor="middle" font-size="15" font-weight="700" fill="#334155">기존 경로와 공유하는 모듈 (재사용, 재작성 안 함)</text>
+    <text x="792" y="592" font-size="12.5" fill="#334155">memory_guard.py — MemAvailable · swap · 온도 · throttle 관찰</text>
+    <text x="792" y="616" font-size="12.5" fill="#334155">process_runner.py — 새 process group · 안전 종료 · peak RSS</text>
+    <text x="792" y="640" font-size="12.5" fill="#334155">llama_options.py — 바이너리 --help 파싱 후 지원 플래그만 사용</text>
+    <text x="792" y="666" font-size="12.5" fill="#334155">metrics.py — atomic write · job_state.py — 상태머신 · lock</text>
+  </g>
+  <path d="M860,478 L860,510 L400,510 L400,532" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ar-arrow)"/>
+  <path d="M629,478 L629,510" fill="none" stroke="#64748b" stroke-width="2.5"/>
+</svg>
