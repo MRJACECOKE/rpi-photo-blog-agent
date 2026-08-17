@@ -26,7 +26,9 @@ PY
 
 [[ -d .venv-blog-agent ]] && pass "독립 venv 존재" || warn ".venv-blog-agent 없음"
 
-for bin in third_party/llama.cpp/build/bin/llama-completion third_party/llama.cpp/build/bin/llama-mtmd-cli; do
+# llama-server는 job 파이프라인(app.cli_jobs)의 작성 단계에서 쓴다.
+# 없으면: cd third_party/llama.cpp && cmake --build build --target llama-server
+for bin in third_party/llama.cpp/build/bin/llama-completion third_party/llama.cpp/build/bin/llama-mtmd-cli third_party/llama.cpp/build/bin/llama-server; do
   [[ -x "$bin" ]] && pass "llama 바이너리: $bin" || warn "llama 바이너리 없음: $bin"
 done
 
@@ -88,3 +90,24 @@ else
 fi
 
 touch outputs/.write-test && rm outputs/.write-test && pass "outputs 쓰기 가능" || fail "outputs 쓰기 불가"
+
+# --- job 파이프라인(app.cli_jobs / GUI) 전용 점검 ---
+[[ -f models/privacy/face_detection_yunet_2023mar.onnx ]] \
+  && pass "얼굴 검출 모델 존재" \
+  || warn "얼굴 검출 모델 없음: models/privacy/face_detection_yunet_2023mar.onnx (개인정보 1차 검사가 얼굴을 놓칩니다)"
+
+for cfg in config/models.yaml config/blog.yaml config/runtime.yaml config/prompts.yaml; do
+  [[ -f "$cfg" ]] && pass "설정 파일: $cfg" || warn "설정 파일 없음: $cfg"
+done
+
+if .venv-blog-agent/bin/python -c "import fastapi, uvicorn, jinja2, multipart" 2>/dev/null; then
+  pass "GUI 의존성 설치됨"
+else
+  warn "GUI 의존성 없음 (pip install -r requirements.txt)"
+fi
+
+if .venv-blog-agent/bin/python -c "import cv2" 2>/dev/null; then
+  pass "opencv 설치됨 (개인정보 1차 검사)"
+else
+  warn "opencv 없음 — 얼굴/QR 검사를 건너뛰고 사유만 기록합니다"
+fi

@@ -1,5 +1,28 @@
-Pillow==12.3.0
-psutil==7.2.2
-PyYAML==6.0.3
+# 실제 import를 기준으로 작성한다. pip freeze를 통째로 복사하지 않는다.
+# 전이 의존성(anyio, click, h11 ...)은 여기 적지 않는다. pip이 알아서 가져온다.
+
+# 핵심 파이프라인
+Pillow==12.3.0            # app/image_prep.py, app/privacy.py, app/image_preprocessor.py
+psutil==7.2.2             # app/memory_guard.py, app/process_runner.py, bench/bench.py
+PyYAML==6.0.3             # app/settings.py, app/prompt_builder.py
+
+# GUI (app/gui/)
+fastapi==0.141.1
+uvicorn==0.52.3
+Jinja2==3.1.6
+python-multipart==0.0.32  # fastapi의 File/Form 업로드에 필요하다
+
+# 개인정보 1차 검사 (app/privacy.py) — import 실패해도 파이프라인은 돌지만 사유를 기록한다
+opencv-python-headless==5.0.0.93
+# 얼굴 검출 가중치는 pip으로 오지 않는다. models/privacy/ 에 별도로 둔다:
+#   curl -sSL -o models/privacy/face_detection_yunet_2023mar.onnx \
+#     https://github.com/opencv/opencv_zoo/raw/main/models/face_detection_yunet/face_detection_yunet_2023mar.onnx
+
+# HEIC 입력 (app/image_prep.py) — 없으면 heic 파일만 건너뛰고 사유를 남긴다
+pillow_heif==1.5.0
+
+# 모델 조회/다운로드 (app/model_discovery.py, scripts/download_models.py). 오프라인 실행에는 필요 없다.
 huggingface_hub==1.24.0
+
+# 테스트
 pytest==9.1.1
