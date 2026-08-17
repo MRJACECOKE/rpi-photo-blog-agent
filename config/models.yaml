@@ -1,0 +1,129 @@
+# 모델 tier 사다리. 위에서부터 시도하고 게이트 미달 시 아래 tier로 내려간다.
+# expected_rss_mb / measured_* 값은 bench/RESULTS.md 실측에서 가져온 것이며 추정치가 아니다.
+version: 1
+
+defaults:
+  threads: 4
+  threads_batch: 4
+  gpu_layers: 0
+  # 실측 기준선. bench/bench.py로 갱신한다.
+  bench_reference: bench/RESULTS.md
+
+gates:
+  # Phase 0 합격 기준
+  min_gen_tokens_per_sec: 1.5
+  max_vlm_seconds_per_image: 180
+  max_swap_used_mb_during_run: 512
+
+vlm:
+  tiers:
+    - name: qwen2.5-vl-3b-q4_k_m
+      backend: llamacpp_mtmd
+      binary: third_party/llama.cpp/build/bin/llama-mtmd-cli
+      model_path: models/vlm/Qwen2.5-VL-3B-Instruct-Q4_K_M.gguf
+      mmproj_path: models/vlm/mmproj-Qwen2.5-VL-3B-Instruct-Q8_0.gguf
+      ctx_size: 4096
+      max_tokens: 420
+      temperature: 0.2
+      top_p: 0.9
+      expected_rss_mb: 5100
+      # 실측: 1024px는 227.9s로 180s 게이트 초과. 768px에서 159.8s로 통과.
+      image_max_edge: 768
+      retry_image_max_edge: 640
+      measured:
+        status: passed
+        seconds_per_image_768: 159.8
+        seconds_per_image_1024: 227.9
+        peak_rss_mb: 5038
+        min_available_mb: 11764
+        max_temp_c: 68.8
+        source: bench/raw/vlm-3b-768-ko2/record.json
+    - name: ollama-qwen3-vl-2b
+      backend: ollama
+      model: qwen3-vl:2b
+      endpoint: http://127.0.0.1:11434
+      ctx_size: 4096
+      max_tokens: 700
+      temperature: 0.2
+      expected_rss_mb: 2600
+      image_max_edge: 896
+      retry_image_max_edge: 768
+      measured:
+        status: fallback_only
+
+llm:
+  tiers:
+    - name: qwen3-30b-a3b-iq2_m
+      backend: llamacpp_server
+      binary: third_party/llama.cpp/build/bin/llama-server
+      model_path: models/llm/Qwen3-30B-A3B-Instruct-2507-UD-IQ2_M.gguf
+      # 섹션 단위 생성이므로 8192면 outline + 누적 초안을 담기에 충분하다.
+      ctx_size: 8192
+      batch_size: 128
+      ubatch_size: 64
+      cache_type_k: q8_0
+      cache_type_v: q8_0
+      max_tokens: 560
+      temperature: 0.7
+      top_p: 0.9
+      top_k: 40
+      repeat_penalty: 1.08
+      # 실측 peak RSS는 mmap 파일 페이지를 포함한 값이다. MemAvailable은 14GB대로 유지됐다.
+      expected_rss_mb: 10800
+      # 이 tier를 시작하기 위해 필요한 최소 MemAvailable
+      min_free_mb: 12288
+      port: 8771
+      measured:
+        status: passed
+        cold_load_s: 137.84
+        warm_load_s: 1.85
+        prompt_tok_s: 8.57
+        gen_tok_s: 4.79
+        peak_rss_mb: 10726
+        min_available_mb: 14287
+        max_swap_used_mb: 0
+        max_temp_c: 61.1
+        source: bench/raw/tierA-iq2m-c4096/record.json
+
+    # 이 장비에 이미 있던 별도 GGUF를 폴백으로 등록한다. 저장소 밖 절대 경로다.
+    # 다른 장비에서는 파일이 없어 is_available()이 false가 되고, 사다리에서 조용히 건너뛴다.
+    - name: qwen3-30b-a3b-q3_k_s
+      backend: llamacpp_server
+      binary: third_party/llama.cpp/build/bin/llama-server
+      model_path: /home/pi/llm/rpi5-qwen3-30b/models/Qwen3-30B-A3B-Instruct-2507-Q3_K_S-2.70bpw.gguf
+      ctx_size: 6144
+      batch_size: 128
+      ubatch_size: 64
+      cache_type_k: q8_0
+      cache_type_v: q8_0
+      max_tokens: 520
+      temperature: 0.7
+      top_p: 0.9
+      top_k: 40
+      repeat_penalty: 1.08
+      expected_rss_mb: 10300
+      min_free_mb: 11800
+      port: 8771
+      measured:
+        status: unmeasured
+
+    - name: ollama-qwen2.5-3b
+      backend: ollama
+      model: qwen2.5:3b
+      endpoint: http://127.0.0.1:11434
+      ctx_size: 4096
+      max_tokens: 480
+      temperature: 0.7
+      top_p: 0.9
+      expected_rss_mb: 2600
+      min_free_mb: 4096
+      measured:
+        status: fallback_only
+
+# 30B dense 계열은 16GB에서 적재 불가하므로 사다리에 포함하지 않는다.
+# 근거: MoE(총 30B / 활성 3B) IQ2_M 10.1GiB가 실측 합격했고, dense 30B Q4는 18GiB로 물리 메모리를 초과한다.
+excluded:
+  - name: qwen3-30b-dense-q4_k_m
+    reason: "Q4_K_M 약 18GiB. 16GB RAM에서 적재 불가."
+  - name: ollama-qwen3:30b-a3b
+    reason: "Ollama Q4 18GiB 경로는 이전 실행에서 OOM을 유발해 폐기됨."

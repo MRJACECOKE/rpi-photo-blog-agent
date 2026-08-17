@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="600" viewBox="0 0 1500 600" role="img" aria-labelledby="mt-title mt-desc">
+  <title id="mt-title">실측 메모리 타임라인과 언로드 게이트</title>
+  <desc id="mt-desc">VLM 실행 구간과 LLM 실행 구간 사이에 언로드 게이트가 있으며, 실제 측정된 MemAvailable 값이 표시되어 있다. mmap 때문에 RSS가 높아도 MemAvailable은 유지된다.</desc>
+  <defs>
+    <marker id="mt-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+    </marker>
+    <filter id="mt-shadow"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity="0.13"/></filter>
+  </defs>
+
+  <rect width="1500" height="600" rx="24" fill="#f8fafc"/>
+  <text x="60" y="58" font-family="sans-serif" font-size="28" font-weight="700" fill="#0f172a">실측 메모리 타임라인 (job 20260817-e2e-kitchen)</text>
+  <text x="60" y="90" font-family="sans-serif" font-size="16" fill="#475569">MemTotal 16,214 MiB · 사진 4장 · 모든 수치는 추정이 아니라 실행 중 기록된 값</text>
+
+  <!-- Y축 라벨 -->
+  <text x="60" y="140" font-family="sans-serif" font-size="14" font-weight="700" fill="#334155">MemAvailable</text>
+  <line x1="60" y1="152" x2="1440" y2="152" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="1448" y="157" font-family="sans-serif" font-size="12" fill="#94a3b8" text-anchor="end">16,214 MiB</text>
+
+  <!-- 기준선: LLM 요구치 -->
+  <line x1="150" y1="248" x2="1440" y2="248" stroke="#ea580c" stroke-width="2" stroke-dasharray="8 5"/>
+  <text x="1440" y="242" font-family="sans-serif" font-size="13" font-weight="700" fill="#9a3412" text-anchor="end">LLM 시작 요구치 12,288 MiB</text>
+
+  <!-- 실측 곡선 영역 -->
+  <g font-family="sans-serif">
+    <!-- VLM 구간 -->
+    <rect x="150" y="196" width="330" height="120" rx="10" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+    <text x="315" y="222" text-anchor="middle" font-size="16" font-weight="700" fill="#075985">STAGE_2 · VLM 실행</text>
+    <text x="315" y="246" text-anchor="middle" font-size="13" fill="#0c4a6e">Qwen2.5-VL-3B · 사진 4장 순차</text>
+    <text x="315" y="268" text-anchor="middle" font-size="13" fill="#0c4a6e">peak RSS 5,073 MB</text>
+    <text x="315" y="290" text-anchor="middle" font-size="13" font-weight="700" fill="#0c4a6e">MemAvailable 최저 11,764 MiB</text>
+    <text x="315" y="309" text-anchor="middle" font-size="12" fill="#0369a1">661초 (장당 150~175초)</text>
+
+    <!-- 게이트 -->
+    <rect x="510" y="176" width="280" height="160" rx="10" fill="#fff7ed" stroke="#ea580c" stroke-width="3"/>
+    <text x="650" y="202" text-anchor="middle" font-size="16" font-weight="700" fill="#9a3412">STAGE_3 · 언로드 게이트</text>
+    <text x="650" y="228" text-anchor="middle" font-size="13" fill="#7c2d12">VLM PID 8362 소멸 확인 ✓</text>
+    <text x="650" y="252" text-anchor="middle" font-size="14" font-weight="700" fill="#7c2d12">언로드 전 15,105 MiB</text>
+    <text x="650" y="274" text-anchor="middle" font-size="14" font-weight="700" fill="#7c2d12">언로드 후 15,105 MiB</text>
+    <text x="650" y="296" text-anchor="middle" font-size="13" fill="#7c2d12">목표 12,288 MiB · 통과 ✓</text>
+    <text x="650" y="318" text-anchor="middle" font-size="12" fill="#9a3412">대기 0.01초 · drop_caches 불필요</text>
+
+    <!-- LLM 구간 -->
+    <rect x="820" y="196" width="620" height="120" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+    <text x="1130" y="222" text-anchor="middle" font-size="16" font-weight="700" fill="#5b21b6">STAGE_4 · LLM 실행</text>
+    <text x="1130" y="246" text-anchor="middle" font-size="13" fill="#4c1d95">Qwen3-30B-A3B UD-IQ2_M (10.1 GiB) · llama-server 1회 기동 (48초)</text>
+    <text x="1130" y="268" text-anchor="middle" font-size="13" fill="#4c1d95">peak RSS 11,195 MB — 그러나 대부분 mmap된 파일 페이지</text>
+    <text x="1130" y="290" text-anchor="middle" font-size="13" font-weight="700" fill="#4c1d95">MemAvailable 15,108 MiB 유지 (거의 감소하지 않음)</text>
+    <text x="1130" y="309" text-anchor="middle" font-size="12" fill="#6d28d9">섹션 12개 순차 생성</text>
+  </g>
+
+  <!-- 화살표 -->
+  <g fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#mt-arrow)">
+    <path d="M482,256 L506,256"/>
+    <path d="M792,256 L816,256"/>
+  </g>
+
+  <!-- 핵심 해설 -->
+  <g font-family="sans-serif" filter="url(#mt-shadow)">
+    <rect x="60" y="364" width="680" height="200" rx="14" fill="#ffffff" stroke="#0284c7" stroke-width="2"/>
+    <text x="85" y="394" font-size="16" font-weight="700" fill="#075985">왜 RSS 11 GB인데 메모리가 안 부족한가</text>
+    <text x="85" y="424" font-size="13.5" fill="#334155">llama.cpp는 GGUF를 <tspan font-weight="700">mmap</tspan>한다. RSS에 잡히는 10 GB 대부분은</text>
+    <text x="85" y="446" font-size="13.5" fill="#334155">익명 메모리가 아니라 <tspan font-weight="700">파일 백업 페이지</tspan>다. 커널이 필요하면 언제든</text>
+    <text x="85" y="468" font-size="13.5" fill="#334155">회수할 수 있으므로 MemAvailable에서 빠지지 않는다.</text>
+    <text x="85" y="498" font-size="13.5" fill="#334155">그래서 게이트 기준을 <tspan font-weight="700" fill="#dc2626">RSS가 아니라 MemAvailable</tspan>로 잡았고,</text>
+    <text x="85" y="520" font-size="13.5" fill="#334155">tier마다 실측 기반 min_free_mb를 따로 둔다.</text>
+    <text x="85" y="548" font-size="12.5" fill="#64748b">RSS로 판단했다면 10.7 GB &gt; 여유라고 오판해 tier를 불필요하게 낮췄을 것이다.</text>
+  </g>
+
+  <g font-family="sans-serif" filter="url(#mt-shadow)">
+    <rect x="760" y="364" width="680" height="200" rx="14" fill="#ffffff" stroke="#ea580c" stroke-width="2"/>
+    <text x="785" y="394" font-size="16" font-weight="700" fill="#9a3412">게이트가 통과하지 못하면</text>
+    <text x="785" y="424" font-size="13.5" fill="#334155">① PID가 살아 있으면 SIGTERM → 10초 대기 → SIGKILL</text>
+    <text x="785" y="446" font-size="13.5" fill="#334155">② MemAvailable을 2초 간격으로 최대 60초 폴링</text>
+    <text x="785" y="468" font-size="13.5" fill="#334155">③ 절반 시점에 root면 sync + drop_caches 1회</text>
+    <text x="785" y="490" font-size="13.5" fill="#334155">④ 그래도 미달이면 <tspan font-weight="700" fill="#dc2626">FAILED_RECOVERABLE</tspan> 기록 후</text>
+    <text x="785" y="512" font-size="13.5" fill="#334155">   한 tier 낮은 LLM으로 바꿔 게이트를 다시 건다</text>
+    <text x="785" y="548" font-size="12.5" fill="#64748b">전체를 중단하지 않는다. 근거를 남기고 전략을 바꿔 계속 진행한다.</text>
+  </g>
+</svg>

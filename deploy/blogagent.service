@@ -1,0 +1,25 @@
+# 로컬 블로그 에이전트 GUI. 자동 활성화는 사용자 확인 후에만 한다.
+#   sudo cp deploy/blogagent.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now blogagent
+[Unit]
+Description=Local Blog Agent GUI (photo -> VLM -> LLM -> .txt)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/rpi-photo-blog-agent
+ExecStart=/home/pi/rpi-photo-blog-agent/.venv-blog-agent/bin/uvicorn app.gui.app:app --host 0.0.0.0 --port 8770
+Restart=on-failure
+RestartSec=5
+# 30B MoE IQ2_M은 mmap으로 약 10.7GB를 매핑한다. 상한을 너무 낮게 잡으면 실행 중 죽는다.
+MemoryAccounting=true
+MemoryMax=15G
+TasksMax=128
+Nice=5
+OOMPolicy=stop
+
+[Install]
+WantedBy=multi-user.target

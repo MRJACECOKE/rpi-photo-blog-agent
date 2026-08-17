@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>로컬 블로그 에이전트</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<header class="sysbar">
+  <div class="brand">로컬 블로그 에이전트</div>
+  <div class="stats" id="sysStats">
+    <span class="stat" id="statRam">RAM —</span>
+    <span class="stat" id="statTemp">온도 —</span>
+    <span class="stat" id="statThrottle">스로틀 —</span>
+    <span class="stat" id="statDisk">디스크 —</span>
+    <span class="stat model" id="statModel">모델 —</span>
+  </div>
+</header>
+
+<main class="layout">
+  <section class="panel upload">
+    <h2>1. 사진 업로드</h2>
+    <div id="dropzone" class="dropzone">
+      <p>여기에 사진을 끌어다 놓거나 클릭해서 선택하세요</p>
+      <p class="hint">jpg · png · webp · heic</p>
+      <input type="file" id="fileInput" multiple accept=".jpg,.jpeg,.png,.webp,.heic,.heif" hidden>
+    </div>
+    <div id="thumbs" class="thumbs"></div>
+    <p class="hint" id="uploadHint"></p>
+  </section>
+
+  <section class="panel run">
+    <h2>2. 실행</h2>
+    <label>카테고리
+      <select id="category">
+        {% for c in categories %}
+        <option value="{{ c }}" {% if c == default_category %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>주제 힌트 (선택)
+      <input type="text" id="topic" placeholder="예: 신발장 위주로, 좁은 주방 수납">
+    </label>
+    <div class="actions">
+      <button id="btnStart" class="primary">블로그 생성 시작</button>
+      <button id="btnCancel" class="ghost" disabled>안전 취소</button>
+    </div>
+
+    <div class="pipeline" id="pipeline"></div>
+    <div class="progressWrap">
+      <div class="progressBar"><div id="progressFill"></div></div>
+      <p class="progressText" id="progressText">대기 중</p>
+    </div>
+    <div id="privacyBanner" class="banner hidden"></div>
+  </section>
+
+  <section class="panel history">
+    <h2>과거 작업</h2>
+    <div id="jobList" class="jobList"></div>
+  </section>
+
+  <section class="panel result">
+    <h2>결과</h2>
+    <div class="actions">
+      <button id="btnSave" class="primary" disabled>저장</button>
+      <button id="btnDownload" class="ghost" disabled>다운로드 .txt</button>
+      <button id="btnCopy" class="ghost" disabled>클립보드 복사</button>
+      <button id="btnRegen" class="ghost" disabled>재생성</button>
+    </div>
+    <div id="qualityBox" class="quality hidden"></div>
+    <textarea id="resultText" spellcheck="false" placeholder="생성이 끝나면 여기에 .txt 내용이 표시됩니다."></textarea>
+  </section>
+
+  <section class="panel logs">
+    <h2>실시간 로그
+      <label class="autoscroll"><input type="checkbox" id="autoscroll" checked> 자동 스크롤</label>
+    </h2>
+    <pre id="logView"></pre>
+  </section>
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

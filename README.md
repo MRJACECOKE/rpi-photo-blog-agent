@@ -6,7 +6,60 @@ Raspberry Pi 5 16GB에서 사진 한 장을 로컬 VLM으로 분석한 뒤, VLM 
 
 Python은 모델을 직접 로드하지 않습니다. 프로젝트 전용으로 빌드한 `llama.cpp`의 `llama-mtmd-cli`와 `llama-completion`을 subprocess로 한 번씩 실행합니다. VLM과 LLM은 동시에 실행되지 않습니다.
 
+## 두 가지 실행 경로
+
+| | 사진 1장 → Markdown | **사진 여러 장 → `.txt` (+ GUI)** |
+|---|---|---|
+| 진입점 | `python -m app.cli --image ...` | `python -m app.cli_jobs` / `scripts/run_gui.sh` |
+| 출력 | `outputs/<run_id>.md` | `output/<job_id>/<slug>.txt` + `.meta.json` + `images/` |
+| LLM | `llama-completion` 1회 | `llama-server` 1회 기동 후 섹션 단위 생성 |
+| 개인정보 | VLM privacy_notes | 규칙 기반 1차 + VLM 2차, `PRIVACY_HOLD` 분류 |
+| 재개 | 없음 | `state/jobs/<job_id>.json` 기반 resume |
+
+부엌가구·싱크대·신발장 같은 **가구 사진 여러 장을 한 편의 한국어 블로그 글로** 만드는 쪽이 두 번째 경로입니다.
+자세한 설계는 [`docs/JOB_PIPELINE.md`](docs/JOB_PIPELINE.md)를 보세요.
+
+```bash
+./scripts/preflight.sh                                    # 점검
+./scripts/run_cli.sh new --images ~/photos --category 부엌가구
+./scripts/run_cli.sh run --job <job_id>
+./scripts/run_gui.sh                                      # http://<pi-ip>:8770
+```
+
+GUI는 파이프라인을 직접 실행하지 않고 CLI와 같은 orchestrator(`app/pipeline.py`)를 호출합니다.
+
+![6단계 파이프라인](docs/diagrams/job-pipeline.svg)
+
+## 클라우드 API를 쓰지 않는다는 것을 직접 확인하는 방법
+
+실행 중에 아래를 돌리면 됩니다. 모든 추론은 이 장비의 `llama.cpp` 프로세스에서 일어납니다.
+
+```bash
+ps -eo pid,rss,args | grep llama-server   # 로드한 GGUF 경로 확인
+ss -tanp | grep "pid=<PID>"               # 루프백 외 연결이 없어야 함
+grep gguf /proc/<PID>/maps                # 모델이 프로세스에 mmap됐는지
+grep -rniE "api\.openai|anthropic|googleapis|Authorization: Bearer" app/   # 0건
+```
+
+실제 확인 결과는 [`docs/JOB_PIPELINE.md` §12](docs/JOB_PIPELINE.md)에 있습니다.
+
 ## 문서
+
+**이번 스코프 (사진 여러 장 → `.txt` + GUI)**
+
+| 문서 | 내용 |
+|---|---|
+| [작업 지시서](WORK_ORDER.md) | 무엇을 만들어야 하는가, 완료 판정 기준 |
+| [엔지니어링 문서](docs/JOB_PIPELINE.md) | 설계와 판단 근거 (다이어그램 6종 포함) |
+| [소스 맵](docs/SOURCE_MAP.md) | 파일별 책임, "어디를 고쳐야 하는가" |
+| [한계점 · 문제점 · 개선점](docs/LIMITATIONS.md) | **인수인계용 결함 목록. 먼저 읽을 것** |
+| [Phase 0 실측 결과](bench/RESULTS.md) | 하드웨어·모델 벤치마크와 tier 결정 근거 |
+| [재시도 로그](RETRY_LOG.md) | 전략을 바꾼 지점과 이유 |
+| [작업 로그](WORK_LOG.md) | 시간순 기록 |
+| [진행 상태](TASK_STATUS.md) | 완료 정의 체크리스트 |
+| [에이전트 규칙](AGENTS.md) | 이 저장소의 불변 원칙과 금지 사항 |
+
+**기존 스코프 (사진 1장 → Markdown)**
 
 - [Engineering handoff](HANDOFF.md)
 - [설계·운영 기술 문서](docs/ENGINEERING.md)

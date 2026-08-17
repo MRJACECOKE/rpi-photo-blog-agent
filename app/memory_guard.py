@@ -33,10 +33,20 @@ class MemorySnapshot:
 
 
 class MemoryGuard:
-    def __init__(self, min_during_run_mb: int = 512, check_interval_sec: float = 1.0, logger: logging.Logger | None = None) -> None:
+    def __init__(
+        self,
+        min_during_run_mb: int = 512,
+        check_interval_sec: float = 1.0,
+        logger: logging.Logger | None = None,
+        max_swap_used_percent: float = 85.0,
+        abort_above_celsius: float = 82.0,
+    ) -> None:
         self.min_during_run_mb = min_during_run_mb
         self.check_interval_sec = check_interval_sec
         self.logger = logger or LOG
+        # 기본값은 기존 동작과 같다. job 파이프라인은 config/runtime.yaml 값을 넘긴다.
+        self.max_swap_used_percent = max_swap_used_percent
+        self.abort_above_celsius = abort_above_celsius
         self.maximum_temp_c: float | None = None
         self.throttling_detected = False
 
@@ -150,10 +160,10 @@ class MemoryGuard:
         snap = self.snapshot(pid)
         if snap.mem_available_mb < self.min_during_run_mb:
             return f"MemAvailable dropped below {self.min_during_run_mb} MiB ({snap.mem_available_mb} MiB)"
-        if snap.swap_used_percent > 85.0:
-            return f"swap usage exceeded 85% ({snap.swap_used_percent:.1f}%)"
-        if snap.cpu_temp_c is not None and snap.cpu_temp_c >= 82.0:
-            return f"CPU temperature exceeded 82C ({snap.cpu_temp_c:.1f}C)"
+        if snap.swap_used_percent > self.max_swap_used_percent:
+            return f"swap usage exceeded {self.max_swap_used_percent:.0f}% ({snap.swap_used_percent:.1f}%)"
+        if snap.cpu_temp_c is not None and snap.cpu_temp_c >= self.abort_above_celsius:
+            return f"CPU temperature exceeded {self.abort_above_celsius:.0f}C ({snap.cpu_temp_c:.1f}C)"
         return None
 
     def maybe_drop_caches_after_vlm(self, allow_cache_drop: bool, vlm_pid_alive: bool) -> bool:

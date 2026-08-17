@@ -1,5 +1,9 @@
 # Raspberry Pi 5 로컬 사진 블로그 에이전트 엔지니어링 문서
 
+> **범위 안내.** 이 문서는 **사진 1장 → Markdown** 경로(`app/cli.py`, `app/orchestrator.py`)를 설명한다.
+> 이후 추가된 **사진 여러 장 → `.txt` + GUI** 경로는 별도 문서에 있다: [`JOB_PIPELINE.md`](JOB_PIPELINE.md).
+> 두 경로는 `memory_guard.py`, `process_runner.py`, `model_discovery.py`, `llama_options.py`를 공유한다.
+
 ## 1. 목적과 범위
 
 이 시스템은 Raspberry Pi 5 16GB 한 대에서 사진을 로컬 VLM으로 구조화하고, VLM 메모리가 해제된 뒤 로컬 LLM으로 한국어 Markdown 블로그를 생성한다. 외부 추론 API를 사용하지 않으며 Python 프로세스는 모델을 직접 로드하지 않는다.

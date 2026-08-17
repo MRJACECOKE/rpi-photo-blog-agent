@@ -13,3 +13,18 @@ inputs/downloaded-test.jpg
 models/**/*.gguf
 models/**/*.gguf.*
 third_party/llama.cpp/
+
+# 사진 -> 블로그 job 파이프라인 산출물 (코드만 커밋한다)
+inbox/*
+!inbox/.gitkeep
+work/*
+!work/.gitkeep
+output/*
+!output/.gitkeep
+state/jobs/*
+state/run.lock
+bench/raw/
+bench/bench_image_*.jpg
+
+# 얼굴 검출 모델 (재현 명령은 README에 있다)
+models/privacy/*.onnx

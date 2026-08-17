@@ -1,0 +1,20 @@
+[
+  {
+    "title": "File:Blue white kitchen interior (Unsplash).jpg",
+    "file": "fixtures/kitchen/blue-white-kitchen.jpg",
+    "bytes": 442498,
+    "license": "CC0",
+    "artist": "NeONBRAND <a rel=\"nofollow\" class=\"external text\" href=\"https://unsplash.com/@neonbrand\">neonbrand</a>",
+    "descurl": "https://commons.wikimedia.org/wiki/File:Blue_white_kitchen_interior_(Unsplash).jpg",
+    "sha256": "d79a49415088022cc612bd9fd184de0c88dd396af0f1f92f445e8172e11d6e7f"
+  },
+  {
+    "title": "File:Terrytown Louisiana Kitchen Interior.jpg",
+    "file": "fixtures/kitchen/terrytown-kitchen.jpg",
+    "bytes": 666237,
+    "license": "CC BY-SA 4.0",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Infrogmation\" title=\"User:Infrogmation\">Infrogmation of New Orleans</a>",
+    "descurl": "https://commons.wikimedia.org/wiki/File:Terrytown_Louisiana_Kitchen_Interior.jpg",
+    "sha256": "1c60a1ce465acfbe22f74e1fdd8a0494896754465f06b97e01a8b5ed94399b5d"
+  }
+]
