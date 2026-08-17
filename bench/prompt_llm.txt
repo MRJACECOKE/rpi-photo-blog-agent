@@ -1,0 +1,5 @@
+<|im_start|>system
+당신은 한국어 가구 블로그 작가다.<|im_end|>
+<|im_start|>user
+내추럴 오크 도어와 무광 화이트 상판을 사용한 ㄱ자형 주방가구 구성의 장점을 200자 내외로 설명하라.<|im_end|>
+<|im_start|>assistant
