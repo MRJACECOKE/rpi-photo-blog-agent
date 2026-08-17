@@ -1,0 +1,234 @@
+# 블로그 문체·구조·품질 규칙. 코드에 하드코딩하지 않는다.
+version: 1
+
+language: ko
+timezone: Asia/Seoul
+
+categories:
+  - 부엌가구
+  - 싱크대
+  - 신발장
+  - 수납가구
+  - 인테리어
+
+default_category: 부엌가구
+
+# 이미지 파일명 slug에 쓰는 영문 표기. IMG_0012.jpg 같은 원본 파일명은 출력에 쓰지 않는다.
+category_slugs:
+  부엌가구: kitchen-cabinet
+  싱크대: kitchen-sink
+  신발장: shoe-cabinet
+  수납가구: storage-cabinet
+  인테리어: interior
+
+style:
+  # 사진에서 확인되지 않은 사실을 만들지 않는다는 원칙이 문체보다 우선한다.
+  voice: "정보 전달 중심의 담백한 한국어 존댓말"
+  forbid_exaggeration: true
+  # 전문용어 첫 등장 시 한글(English) 병기
+  glossary:
+    상판: Countertop
+    힌지: Hinge
+    수납장: Cabinet
+    서랍: Drawer
+    상부장: Wall Cabinet
+    하부장: Base Cabinet
+    키큰장: Tall Cabinet
+    아일랜드: Island
+    싱크볼: Sink Bowl
+    도어: Door
+    손잡이: Handle
+    간접조명: Cove Lighting
+    필름: Film Finish
+    도장: Painted Finish
+
+length:
+  # 한글 기준 글자 수(공백 포함). 채우기 위한 반복은 금지한다.
+  min_chars: 1800
+  max_chars: 3000
+  # 섹션당 생성 토큰 상한
+  max_tokens_per_section: 560
+
+sections:
+  # id는 코드가 참조하는 키, title은 본문에 출력되는 제목이다.
+  - id: title
+    title: "제목"
+    kind: title
+    guidance: "사진에서 확인된 특징만 담은 25자 내외 제목 1개. 따옴표·마크다운·번호 없이 제목 문장만 출력."
+  - id: overview
+    title: "한눈에 보기"
+    kind: bullets
+    min_items: 3
+    max_items: 5
+    guidance: "사진 분석 JSON에서 확인된 사실만 3~5줄로 요약. 각 줄 45자 이내."
+  - id: fit_space
+    title: "이 구성이 어떤 공간에 맞는가"
+    kind: prose
+    guidance: "확인된 배치(layout)와 수납 구성을 근거로 어떤 형태의 공간에 적합한지 설명. 면적·평수·치수를 단정하지 않는다."
+  - id: design_points
+    title: "사진에서 확인되는 디자인 포인트"
+    kind: prose
+    guidance: "도어 스타일, 색감, 조명, 상판 질감 중 JSON에 실제로 기록된 항목만 다룬다. 확인되지 않은 항목은 아예 언급하지 않는 것이 가장 좋고, 꼭 언급해야 하면 '<항목>은 사진만으로 확인되지 않습니다'라는 완결된 문장 하나로 따로 쓴다. 다른 문장 끝에 이 표현을 덧붙이지 않는다."
+  - id: material_hardware
+    title: "자재와 하드웨어 (Material / Hardware)"
+    kind: prose
+    guidance: "관찰된 마감과 하드웨어를 설명하고, 일반적인 자재 지식은 '일반적으로'라고 명시해 사진 속 제품 스펙으로 단정하지 않는다."
+  - id: storage_design
+    title: "수납 설계 포인트"
+    kind: prose
+    guidance: "storage_features와 sink_features에 기록된 항목 중심. 없는 수납 요소를 추가하지 않는다."
+  - id: pros
+    title: "장점"
+    kind: bullets
+    min_items: 3
+    max_items: 5
+    guidance: "확인된 구성에서 도출되는 장점만. 가격·브랜드 우위 주장 금지."
+  - id: cons
+    title: "단점 / 주의사항"
+    kind: bullets
+    min_items: 3
+    max_items: 5
+    guidance: "같은 구성에서 실제로 발생할 수 있는 불편과 주의점. 균형 있게 서술."
+  - id: care
+    title: "관리 방법"
+    kind: prose
+    guidance: "관찰된 마감 종류에 맞는 일반적인 관리 방법. 특정 제품 세제나 브랜드를 지정하지 않는다."
+  - id: checklist
+    title: "선택 전 체크리스트"
+    kind: bullets
+    min_items: 4
+    max_items: 6
+    guidance: "실제로 확인해야 할 항목을 질문형으로. 견적·가격 언급 금지."
+  - id: faq
+    title: "자주 묻는 질문"
+    kind: qa
+    min_items: 3
+    max_items: 5
+    guidance: "Q./A. 형식. 각 답변 120자 내외. 사진에서 확인되지 않은 사실은 일반론으로 명시."
+  - id: closing
+    title: "정리"
+    kind: prose
+    guidance: "3~5문장으로 마무리. 새로운 사실을 추가하지 않는다."
+
+# VLM 출력 정리 규칙. 실측에서 관측된 오류를 걸러낸다.
+vision_normalization:
+  # 3B VLM이 색상 단어를 hardware_visible / storage_features / sink_features에 넣는 일이 잦다.
+  # ("hardware_visible": ["화이트", "메탈 핸들"] 처럼) 색상만으로 이뤄진 항목은 버린다.
+  # 색상 정보 자체는 color_tone에 이미 들어 있으므로 잃는 것이 없다.
+  color_terms:
+    - 화이트
+    - 블랙
+    - 그레이
+    - 회색
+    - 베이지
+    - 베이지색
+    - 청록색
+    - 블루
+    - 파란색
+    - 갈색
+    - 브라운
+    - 우드
+    - 아이보리
+    - 크림
+    - 네이비
+    - 실버
+    - 골드
+    - 무광
+    - 유광
+    - 흰색
+    - 검정
+    - 검은색
+
+quality:
+  # 아래 정규식 중 하나라도 걸리면 해당 섹션을 재생성한다.
+  banned_patterns:
+    - name: price
+      pattern: "[0-9][0-9,]*\\s*(원|만원|천원)|₩\\s*[0-9]"
+      reason: "가격 정보는 사진에서 확인할 수 없다"
+    - name: phone
+      pattern: "0\\d{1,2}[-. ]?\\d{3,4}[-. ]?\\d{4}"
+      reason: "전화번호는 개인정보다"
+    - name: install_claim
+      pattern: "저희가\\s*시공|당사가\\s*시공|직접\\s*시공한\\s*현장|시공\\s*사례입니다"
+      reason: "시공 주체를 주장할 근거가 없다"
+    - name: customer_review
+      pattern: "고객님\\s*후기|고객\\s*후기|사용\\s*후기를\\s*보내"
+      reason: "존재하지 않는 후기를 인용할 수 없다"
+    - name: certification
+      pattern: "특허\\s*(등록|출원|받은)|친환경\\s*인증|KC\\s*인증|무료\\s*A/?S|평생\\s*보증"
+      reason: "인증·보증은 사진에서 확인할 수 없다"
+    - name: placeholder
+      pattern: "TODO|Lorem|lorem|placeholder|예시입니다|샘플입니다|\\{\\{|\\}\\}"
+      reason: "미완성 산출물"
+    - name: fake_date
+      pattern: "시공(일|일자|날짜)\\s*[:：]|202\\d년\\s*\\d{1,2}월에\\s*시공"
+      reason: "시공 날짜는 사진에서 확인할 수 없다"
+    - name: dimension_claim
+      # 한글이 뒤에 붙으면 \b가 성립하지 않는다("720mm입니다"). 그래서 뒤쪽은 부정 전방탐색으로 막는다.
+      pattern: "\\d{3,4}\\s*mm(?![a-zA-Z])|\\d{1,2}\\s*평(?![가-힣])"
+      reason: "치수와 평수는 사진만으로 단정할 수 없다"
+    # 실측: 모델이 "확인되지 않습니다"를 무관한 문장 끝에 접속어미로 붙여 비문을 만들었다.
+    # ("...조화를 이루고 있으며, 사진만으로는 확인되지 않습니다")
+    - name: dangling_unverified
+      pattern: "(으며|이며|하며|지만|이고|하고),\\s*사진만으로"
+      reason: "확인 불가 표현을 다른 문장에 접속어미로 붙여 비문이 됐다"
+    - name: prompt_leak
+      pattern: "<vision_data>|</vision_data>|시스템 프롬프트|<think>|assistant<\\|"
+      reason: "프롬프트 누출"
+
+  # 사진 분석 JSON에 없는 브랜드가 본문에 등장하면 실패로 처리한다.
+  # 여기 등록된 이름은 일반명사 충돌을 피하기 위한 예외 목록이다.
+  brand_whitelist: []
+  brand_candidates:
+    - 한샘
+    - 리바트
+    - 에넥스
+    - 넵스
+    - 파블로
+    - 하츠
+    - 블룸
+    - Blum
+    - Hafele
+    - 헤펠레
+    - IKEA
+    - 이케아
+    - LX하우시스
+    - KCC
+    - 삼성
+    - LG
+    - 보쉬
+    - Bosch
+    - 지멘스
+
+  # 지역명 + 시공 주장 조합 감지에 사용한다.
+  region_names:
+    - 서울
+    - 경기
+    - 인천
+    - 부산
+    - 대구
+    - 대전
+    - 광주
+    - 울산
+    - 세종
+    - 강남
+    - 분당
+    - 판교
+    - 송도
+    - 일산
+
+  limits:
+    min_sections: 10
+    max_repeat_sentence: 2
+    # 단어 3-gram 기준 (문자 3-gram이 아니다 — quality_stage.py 주석 참조).
+    # 실측 분포: 사람이 쓴 문서 0.004 · 검수 통과 샘플 0.026 · 생성 본문 0.029 · 의도적 반복 0.966
+    max_trigram_self_overlap: 0.15
+    min_hangul_ratio: 0.45
+    max_regeneration_attempts: 3
+
+output:
+  # 최종 산출물은 .txt 1개 + .meta.json 사이드카다.
+  header_rule: "================================================"
+  image_caption: "참고 이미지"
+  source_line: "사용자 제공 사진 (VLM 분석 기반) / 외부 인용 없음"
+  tag_count: 4
